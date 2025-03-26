@@ -1,0 +1,8 @@
+---
+- name: This is user creation file.
+  hosts: all
+  become: True
+  tasks:
+    - name: Creating a user Thor
+      user: name=Thor
+

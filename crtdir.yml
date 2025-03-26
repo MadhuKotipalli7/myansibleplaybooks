@@ -1,0 +1,14 @@
+---
+- name: This file is used to create directory.
+  hosts: all
+  become: True
+  tasks:
+    - name: creating a directory
+      file:
+          path: /home/ansadmin/newdir
+          state: directory
+    - name: creating a directory
+      file:
+          path: /home/ansadmin/newdir2
+          state: directory
+...

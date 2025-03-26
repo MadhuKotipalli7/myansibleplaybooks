@@ -1,0 +1,12 @@
+---
+- name: To copy file which has data from server to nodes
+  hosts: all
+  become: True
+  tasks:
+    - name: copying the file
+      copy:
+        src: /home/ansadmin/Sadfile
+        dest: /home/ansadmin/newdir2/Sadfile
+        mode: 0766
+        owner: Captain
+...

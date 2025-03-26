@@ -1,0 +1,10 @@
+---
+- name: This file install the package required
+  hosts: all
+  become: true
+  tasks:
+    - name: To install package
+      yum:
+        name: tree
+        state: present
+...

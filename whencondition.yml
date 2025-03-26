@@ -1,0 +1,33 @@
+---
+- name: using when condition to install packages which based on requirement
+  hosts: all
+  become: true
+  tasks:
+    - name: to install a package
+      yum:
+        name: httpd
+        state: installed
+      notify: start apache
+      when: ansible_os_family == "RedHat"
+
+    - name: to install apache2
+      yum:
+        name: apache2
+        state: installed
+      notify: start apache
+      when: ansible_os_family == "Debian"
+
+  handlers:
+    - name: start apache
+      service:
+        name: httpd
+        state: started
+      when: ansible_os_family == "RedHat"
+    
+    - name: start apache
+      service:
+        name: apache2
+        state: started
+      when: ansible_os_family == "Debian"
+...
+

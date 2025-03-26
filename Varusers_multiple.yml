@@ -1,0 +1,21 @@
+---
+- name: creation of multiple users using child playbook
+  hosts: all
+  become: yes
+
+  vars_files:
+  - user.yml
+
+  tasks:
+    - name: user creation {{user1}}
+      user:
+        name: "{{user1}}"
+
+    - name: user creation {{user2}}
+      user:
+        name: "{{user2}}"
+
+    - name: user creation {{user3}}
+      user:
+        name: "{{user3}}"
+...

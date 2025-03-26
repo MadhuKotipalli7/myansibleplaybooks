@@ -1,0 +1,14 @@
+---
+- name: Creating a file inside a directory
+  hosts: all
+  become: yes
+  tasks:
+    - name: Creating a file inside newdir
+      file:
+        path: /home/ansadmin/newdir/Happyfile
+        state: touch
+    - name: Creating a file inside newdir2
+      file:
+        path: /home/ansadmin/newdir2/Sadfile
+        state: touch
+...

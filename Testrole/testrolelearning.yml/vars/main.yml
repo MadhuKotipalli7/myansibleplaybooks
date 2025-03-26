@@ -1,0 +1,5 @@
+---
+# vars file for testrolelearning.yml
+
+httpd_package: "httpd"
+apache2_package: "apache2"

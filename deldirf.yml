@@ -1,0 +1,14 @@
+---
+- name: This file deleted file and directory same time.
+  hosts: all
+  become: true
+  tasks:
+    - name: Deleting dir1
+      file:
+        path: /home/ansadmin/dir1
+        state: absent
+    - name: Deleting Sadfile
+      file:
+        path: /home/ansadmin/newdir2/Sadfile
+        state: absent
+...

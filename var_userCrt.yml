@@ -1,0 +1,13 @@
+---
+- name: creation of user using variable
+  hosts: all
+  become: true
+
+  vars:
+    user: Tengen
+
+  tasks:
+    - name: creation of {{user}}
+      user:
+        name: "{{user}}"
+...

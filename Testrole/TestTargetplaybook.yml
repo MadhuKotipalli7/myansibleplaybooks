@@ -1,0 +1,8 @@
+---
+- name: installing an application httpd using (roles)
+  hosts: all
+  become: true
+
+  roles:
+    - testrolelearning.yml
+

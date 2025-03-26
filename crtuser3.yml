@@ -1,0 +1,15 @@
+---
+- name: This file will creates three users at a same time.
+  hosts: all
+  become: True
+  tasks:
+    - name: Creating user Roman
+      user:
+        name: Roman
+    - name: Creating user Dean
+      user:
+        name: Dean
+    - name: Creating user Seth
+      user:
+        name: Seth
+...

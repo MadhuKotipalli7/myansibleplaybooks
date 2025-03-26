@@ -1,0 +1,11 @@
+---
+- name: This file creates two users at a same time.
+  hosts: webservers
+  become: Yes
+  tasks:
+    - name: Creating user called Captain
+      user:
+         name: Captain
+    - name: creating an user called Ironman
+      user:
+         name: Ironman

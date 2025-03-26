@@ -1,0 +1,42 @@
+---
+- name: installation of tomcat apllication, variables included
+  hosts: all
+  become: true
+
+  vars:
+    tomcat_version: 11.0.5
+
+  tasks:
+    - name: installing java on RedHat
+      yum:
+        name: java
+        state: installed
+      when: ansible_os_family == "RedHat"
+
+    - name: installing java on Debian
+      apt:
+        name: java
+        state: installed
+      when: ansible_os_family == "Debian"
+
+    - name: download tomcat
+      get_url:
+        url: https://dlcdn.apache.org/tomcat/tomcat-11/v{{tomcat_version}}/bin/apache-tomcat-{{tomcat_version}}.tar.gz
+        dest: /opt
+
+    - name: untar of tomcat file
+      unarchive:
+        src: /opt/apache-tomcat-{{tomcat_version}}.tar.gz
+        dest: /opt
+        remote_src: yes    # re-checks the file
+
+    - name: changing permissions for the file
+      file:
+        path: /opt/apache-tomcat-{{tomcat_version}}/bin/startup.sh
+        mode: 0777
+
+    - name: start tomcat service
+      shell: nohup ./startup.sh
+      args:
+        chdir: /opt/apache-tomcat-{{tomcat_version}}/bin
+

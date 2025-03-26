@@ -1,0 +1,23 @@
+---
+# tasks file for testrolelearning.yml
+
+- name: installing httpd package
+  yum:
+    name: "{{ httpd_package }}"
+    state: installed
+  notify: start apache
+  when: ansible_os_family == "RedHat"
+
+- name: Installing apache2 package
+  apt:
+    name: "{{ apache2_package }}"
+    state: installed
+  notify: start apache
+  when: ansible_os_family == "Debian"
+
+- name: copying webserver file
+  copy:
+    src: index.html
+    dest: /var/www/html/
+    mode: 0666
+

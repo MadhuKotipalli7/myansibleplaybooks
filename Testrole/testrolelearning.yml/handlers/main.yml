@@ -1,0 +1,13 @@
+---
+# handlers file for testrolelearning.yml
+
+- name: start apache
+  service:
+     name: "{{ httpd_package }}"
+     state: started
+  
+- name: start apache
+  service:
+     name: "{{ apache2_package }}"
+     state: started
+

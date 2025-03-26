@@ -1,0 +1,15 @@
+---
+- name: To install package and start a service
+  hosts: all
+  become: true
+  tasks:
+    - name: to stop service
+      service:
+        name: httpd
+        state: stopped
+
+    - name: to remove package
+      yum:
+        name: httpd
+        state: removed
+...        

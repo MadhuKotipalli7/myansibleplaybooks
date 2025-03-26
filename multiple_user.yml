@@ -1,0 +1,11 @@
+---
+- name: to create multiple users
+  hosts: all
+  become: true
+  tasks:
+    - name: multiple users
+      user: name='{{ item }}' state=present
+      with_items:
+        - Master
+        - Blaster
+        - Roaster

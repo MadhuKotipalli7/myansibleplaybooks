@@ -1,0 +1,10 @@
+---
+- name: To copy directory which has files inside it.
+  hosts: all
+  become: true
+  tasks:
+    - name: to copy directory
+      copy:
+        src: /home/ansadmin/Dir1
+        dest: /home/ansadmin/
+...
