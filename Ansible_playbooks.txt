@@ -1,0 +1,572 @@
+Creating directories.
+
+---
+- name: This file is used to create directory.
+  hosts: all
+  become: True
+  tasks:
+    - name: creating a directory
+      file:
+          path: /home/ansadmin/newdir
+          state: directory
+    - name: creating a directory
+      file:
+          path: /home/ansadmin/newdir2
+          state: directory
+...
+
+-------------------------------------------------------------------------------------------------
+
+Creating file inside a directory
+
+---
+- name: Creating a file inside a directory
+  hosts: all
+  become: yes
+  tasks:
+    - name: Creating a file inside newdir
+      file:
+        path: /home/ansadmin/newdir/Happyfile
+        state: touch
+    - name: Creating a file inside newdir2
+      file:
+        path: /home/ansadmin/newdir2/Sadfile
+        state: touch
+...
+
+------------------------------------------------------------------------------------------------
+
+---
+- name: This is user creation file.
+  hosts: all
+  become: True
+  tasks:
+    - name: Creating a user Thor
+      user: name=Thor
+
+
+----------------------------------------------------------------------------------------------
+---
+- name: This file creates two users at a same time.
+  hosts: webservers
+  become: Yes
+  tasks:
+    - name: Creating user called Captain
+      user:
+         name: Captain
+    - name: creating an user called Ironman
+      user:
+         name: Ironman
+
+
+------------------------------------------------------------------------------------------
+---
+- name: This file will creates three users at a same time.
+  hosts: all
+  become: True
+  tasks:
+    - name: Creating user Roman
+      user:
+        name: Roman
+    - name: Creating user Dean
+      user:
+        name: Dean
+    - name: Creating user Seth
+      user:
+        name: Seth
+...
+
+-------------------------------------------------------------------------------------------
+---
+- name: This file deleted file and directory same time.
+  hosts: all
+  become: true
+  tasks:
+    - name: Deleting dir1
+      file:
+        path: /home/ansadmin/dir1
+        state: absent
+    - name: Deleting Sadfile
+      file:
+        path: /home/ansadmin/newdir2/Sadfile
+        state: absent
+...
+
+----------------------------------------------------------------------------------------------
+---
+- name: To copy file which has data from server to nodes
+  hosts: all
+  become: True
+  tasks:
+    - name: copying the file
+      copy:
+        src: /home/ansadmin/Sadfile
+        dest: /home/ansadmin/newdir2/Sadfile
+        mode: 0766
+        owner: Captain
+...
+
+----------------------------------------------------------------------------------------------------
+
+---
+- name: To copy directory which has files inside it.
+  hosts: all
+  become: true
+  tasks:
+    - name: to copy directory
+      copy:
+        src: /home/ansadmin/Dir1
+        dest: /home/ansadmin/
+...
+
+
+----------------------------------------------------------------------------------------------
+
+---
+- name: This file install the package required
+  hosts: all
+  become: true
+  tasks:
+    - name: To install package
+      yum:
+        name: tree
+        state: present
+...
+
+---------------------------------------------------------------------------------------------
+state: absent ( to remove package)
+
+# makes the comment and then that line won't be executed.
+----------------------------------------------------------------------------------------------
+
+---
+- name: To install package and start a service
+  hosts: all
+  become: true
+  tasks:
+    - name: To install package
+      yum:
+        name: httpd
+        state: installed
+
+    - name: To start service
+      service:
+        name: httpd
+        state: started
+...
+
+--------------------------------------------------------------------------------------
+- name: To stop a service and uninstall a package
+  hosts: all
+  become: true
+  tasks:
+    - name: to stop service
+      service:
+        name: httpd
+        state: stopped
+
+    - name: to remove package
+      yum:
+        name: httpd
+        state: removed
+...
+
+-----------------------------------------------------------------------------------------
+using handlers: (recommended for dependent tasks)
+
+---
+- name: To install and start a service
+  hosts: all
+  become: true
+
+  tasks:
+    - name: to install a package
+      yum:
+        name: httpd
+        state: installed
+      notify: start apache
+
+  handlers:
+    - name: start apache
+      service:
+        name: httpd
+        state: started
+...
+
+------------------------------------------------------------------------------------------
+using when condition and handlers at same time.
+---
+- name: using when condition to install packages which based on requirement
+  hosts: all
+  become: true
+  tasks:
+    - name: to install a package
+      yum:
+        name: httpd
+        state: installed
+      notify: start apache
+      when: ansible_os_family == "RedHat"
+
+    - name: to install apache2
+      apt:
+        name: apache2
+        state: installed
+      notify: start apache
+      when: ansible_os_family == "Debian"
+
+  handlers:
+    - name: start apache
+      service:
+        name: httpd
+        state: started
+      when: ansible_os_family == "RedHat"
+
+    - name: start apache
+      service:
+        name: apache2
+        state: started
+      when: ansible_os_family == "Debian"
+...
+
+-----------------------------------------------------------------------------------------------------------
+making them webservers by copying index.html file to nodes using copy module (handlers used)
+
+---
+- name: making the nodes as webservers
+  hosts: all
+  become: yes
+  tasks:
+    - name: to install httpd
+      yum:
+        name: httpd
+        state: installed
+      notify: start apache
+      when: ansible_os_family == "RedHat"
+
+    - name: to install apache2
+      apt:
+        name: apache2
+        state: installed
+      notify: start apache
+      when: ansible_os_family == "Debian"
+
+    - name: copy index.html
+      copy:
+        src: /home/ansadmin/index.html
+        dest: /var/www/html/
+        mode: 0666
+
+  handlers:
+    - name: start apache
+      service:
+        name: httpd
+        state: started
+      when: ansible_os_family == "RedHat"
+
+    - name: start apache
+      service:
+        name: apache2
+        state: started
+      when: ansible_os_family == "Debian"
+...
+
+--------------------------------------------------------------------------------------------------------------------
+
+To install multiple packages in single go
+
+---
+- name: To install multiple packages
+  hosts: all
+  become: true
+  tasks:
+    - name: multiple packages installation
+      yum:
+        name: ["git", "tree", "httpd", "docker*"]
+        state: installed
+...
+
+--------------------------------------------------------------------------------------------------------------------
+This is old way, But companies are using mostly this way to create users.
+---
+- name: To create multiple users
+  hosts: all
+  become: True
+  tasks:
+    - name: creation of multiple users
+      user: name='{{ item }}' state=present
+      with_items:
+        - John
+        - TripleH
+        - Rock
+...
+
+----------------------------------------------------------------------------------------------------------------
+
+Variables:
+=========================
+---
+- name: creation of user using variable
+  hosts: all
+  become: true
+
+  vars:
+    user: Tengen
+
+  tasks:
+    - name: creation of {{user}}
+      user:
+        name: "{{user}}"
+...
+------------------------------------------------------------------------------------------------------------------
+
+---
+- name: deleting a user using variable
+  hosts: all
+  become: true
+
+  vars:
+    user: Roaster
+
+  tasks:
+    - name: deleting {{user}}
+      user:
+        name: "{{user}}"
+        state: absent
+...
+
+--------------------------------------------------------------------------------------------------------------------
+
+USING CHILD PLAYBOOK (user.yml)
+
+---
+user1: Timon
+user2: Pumba
+user3: Simba
+-----------------------------------------------------------------------------------------------------------------
+
+---
+- name: creation of multiple users using child playbook
+  hosts: all
+  become: yes
+
+  vars_files:
+  - user.yml
+
+  tasks:
+    - name: user creation {{user1}}
+      user:
+        name: "{{user1}}"
+
+    - name: user creation {{user2}}
+      user:
+        name: "{{user2}}"
+
+    - name: user creation {{user3}}
+      user:
+        name: "{{user3}}"
+...
+
+-----------------------------------------------------------------------------------------------------------------
+
+deploying tomcat application: (installation of java, download tomcat, extract tomcat file, change permissions, start tomcat)
+
+- name: intsalltion of tomcat application
+  hosts: all
+  become: true
+  tasks:
+    - name: installation of java on RedHat
+      yum:
+        name: java
+        state: installed
+      when: ansible_os_family == "RedHat"
+
+    - name: installation of java on Debian
+      apt:
+        name: java
+        state: installed
+      when: ansible_os_family == "Debian"
+
+    - name: downloading tomcat
+      get_url:
+        url: https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.5/bin/apache-tomcat-11.0.5.tar.gz
+        dest: /opt
+
+    - name: extraction of tomcat file
+      unarchive:
+        src: /opt/apache-tomcat-11.0.5.tar.gz
+        dest: /opt
+        remote_src: yes   #re-checks the package has been in remote machine or not
+
+    - name: adding executable permission to the tomcat file
+      file:
+        path: /opt/apache-tomcat-11.0.5/bin/startup.sh
+        mode: 0777
+
+    - name: to start tomcat services
+      shell: nohup ./startup.sh
+      args:
+        chdir: /opt/apache-tomcat-11.0.5/bin
+
+...
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+---
+- name: installation of tomcat apllication, variables included
+  hosts: all
+  become: true
+
+  vars:
+    tomcat_version: 11.0.5
+
+  tasks:
+    - name: installing java on RedHat
+      yum:
+        name: java
+        state: installed
+      when: ansible_os_family == "RedHat"
+
+    - name: installing java on Debian
+      apt:
+        name: java
+        state: installed
+      when: ansible_os_family == "Debian"
+
+    - name: download tomcat
+      get_url:
+        url: https://dlcdn.apache.org/tomcat/tomcat-11/v{{tomcat_version}}/bin/apache-tomcat-{{tomcat_version}}.tar.gz
+        dest: /opt
+
+    - name: untar of tomcat file
+      unarchive:
+        src: /opt/apache-tomcat-{{tomcat_version}}.tar.gz
+        dest: /opt
+        remote_src: yes    # re-checks the file
+
+    - name: changing permissions for the file
+      file:
+        path: /opt/apache-tomcat-{{tomcat_version}}/bin/startup.sh
+        mode: 0777
+
+    - name: start tomcat service
+      shell: nohup ./startup.sh
+      args:
+        chdir: /opt/apache-tomcat-{{tomcat_version}}/bin
+
+...
+
+--------------------------------------------------------------------------------------------------------------------------------------
+---
+- name: error-handling file
+  hosts: all
+  become: true
+
+  tasks:
+    - name: install of httpd package
+      yum:
+        name: httpd
+        state: installed
+      notify: start apache
+      when: ansible_os_family == "RedHat"
+
+    - name: install of git package
+      yum:
+        name: gittt   # intentionally error given for git
+        state: installed
+      ignore_errors: yes
+
+    - name: copying website file
+      copy:
+        src: /home/ansadmin/index.html
+        dest: /var/www/html/
+        mode: 0666
+
+  handlers:
+    - name: start apache
+      service:
+        name: httpd
+        state: started
+      when: ansible_os_family == "RedHat"
+
+----------------------------------------------------------------------------------------------------------------------------------start
+
+ROLE:
+
+TARGET SECTION: TestTargetplaybook.yml
+ 
+---
+- name: installing an application httpd using (roles)
+  hosts: all
+  become: true
+
+  roles:
+    - testrolelearning.yml
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+role folder: testrolelearning.yml/
+
+files  handlers  tasks  vars
+
+++++++++++++++++++++++++++++++++++++++++++++++
+
+[ansadmin@ip-172-31-14-162 testrolelearning.yml]$ cat files/index.html
+This is the website data ... Hello summer
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+---
+# tasks file for testrolelearning.yml
+
+- name: installing httpd package
+  yum:
+    name: "{{ httpd_package }}"
+    state: installed
+  notify: start apache
+  when: ansible_os_family == "RedHat"
+
+- name: Installing apache2 package
+  apt:
+    name: "{{ apache2_package }}"
+    state: installed
+  notify: start apache
+  when: ansible_os_family == "Debian"
+
+- name: copying webserver file
+  copy:
+    src: index.html
+    dest: /var/www/html/
+    mode: 0666
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+---
+# vars file for testrolelearning.yml
+
+httpd_package: "httpd"
+apache2_package: "apache2"
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+---
+# handlers file for testrolelearning.yml
+
+- name: start apache
+  service:
+     name: "{{ httpd_package }}"
+     state: started
+
+- name: start apache
+  service:
+     name: "{{ apache2_package }}"
+     state: started
+
+--------------------------------------------------------------------------------------------------------------------------------------end
+
+
+
+
+
