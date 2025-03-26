@@ -136,7 +136,7 @@ Creating file inside a directory
 ---------------------------------------------------------------------------------------------
 state: absent ( to remove package)
 
-# makes the comment and then that line won't be executed.
+#makes the comment and then that line won't be executed.
 ----------------------------------------------------------------------------------------------
 
 ---
